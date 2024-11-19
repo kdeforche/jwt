@@ -403,7 +403,7 @@ public class WTabWidget extends WCompositeWidget {
    * Sets how overflow of contained children must be handled.
    *
    * <p>Calls {@link #setOverflow(Overflow value, EnumSet orientation) setOverflow(value,
-   * EnumSet.of(orientatio, orientation))}
+   * EnumSet.of(orientation, orientation))}
    */
   public final void setOverflow(
       Overflow value, Orientation orientatio, Orientation... orientation) {
