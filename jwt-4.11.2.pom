@@ -10,7 +10,7 @@
   <artifactId>jwt</artifactId>
   <packaging>jar</packaging>
   <name>Java Web Toolkit</name>
-  <version>4.11.1</version>
+  <version>4.11.2</version>
   <description>Java library for developing web applications</description>
   <url>https://webtoolkit.eu/jwt/</url>
 

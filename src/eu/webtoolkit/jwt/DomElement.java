@@ -331,7 +331,7 @@ public class DomElement {
       js.append("o=this;");
       if (anchorClick) {
         js.append(
-            "if(e.ctrlKey||e.metaKey||e.shiftKey||(Wt4_11_1.button(e) > 1))return true;else{");
+            "if(e.ctrlKey||e.metaKey||e.shiftKey||(Wt4.11.2.button(e) > 1))return true;else{");
       }
       js.append(jsCode);
       if (isExposed) {
@@ -438,7 +438,7 @@ public class DomElement {
   public void callMethod(final String method) {
     ++this.numManipulations_;
     if (this.var_.length() == 0) {
-      this.javaScript_.append("Wt4_11_1").append(".$('").append(this.id_).append("').");
+      this.javaScript_.append("Wt4.11.2").append(".$('").append(this.id_).append("').");
     } else {
       this.javaScript_.append(this.var_).append('.');
     }
@@ -493,7 +493,7 @@ public class DomElement {
   }
   /** Removes the element. */
   public void removeFromParent() {
-    this.callJavaScript("Wt4_11_1.remove('" + this.getId() + "');", true);
+    this.callJavaScript("Wt4.11.2.remove('" + this.getId() + "');", true);
   }
   /** Replaces the element by another element. */
   public void replaceWith(DomElement newElement) {
@@ -582,7 +582,7 @@ public class DomElement {
           if (this.removeAllChildren_ >= 0) {
             this.declare(out);
             if (this.removeAllChildren_ == 0) {
-              out.append("Wt4_11_1").append(".setHtml(").append(this.var_).append(", '');\n");
+              out.append("Wt4.11.2").append(".setHtml(").append(this.var_).append(", '');\n");
             } else {
               out.append("(Array.from(")
                   .append(this.var_)
@@ -615,18 +615,18 @@ public class DomElement {
             if (this.properties_.get(Property.StyleDisplay) != null) {
               String style = this.properties_.get(Property.StyleDisplay);
               if (style.equals("none")) {
-                out.append("Wt4_11_1.hide('").append(this.id_).append("');\n");
+                out.append("Wt4.11.2.hide('").append(this.id_).append("');\n");
                 return this.var_;
               } else {
                 if (style.equals("inline")) {
-                  out.append("Wt4_11_1.inline('" + this.id_ + "');\n");
+                  out.append("Wt4.11.2.inline('" + this.id_ + "');\n");
                   return this.var_;
                 } else {
                   if (style.equals("block")) {
-                    out.append("Wt4_11_1.block('" + this.id_ + "');\n");
+                    out.append("Wt4.11.2.block('" + this.id_ + "');\n");
                     return this.var_;
                   } else {
-                    out.append("Wt4_11_1.show('")
+                    out.append("Wt4.11.2.show('")
                         .append(this.id_)
                         .append("', '")
                         .append(style)
@@ -643,7 +643,7 @@ public class DomElement {
             }
           }
           if (this.unwrapped_) {
-            out.append("Wt4_11_1.unwrap('").append(this.id_).append("');\n");
+            out.append("Wt4.11.2.unwrap('").append(this.id_).append("');\n");
           }
           this.processEvents(app);
           this.processProperties(app);
@@ -660,7 +660,7 @@ public class DomElement {
                 .append(");\n");
             this.replaced_.createElement(out, app, insertJs.toString());
             if (this.unstubbed_) {
-              out.append("Wt4_11_1.unstub(")
+              out.append("Wt4.11.2.unstub(")
                   .append(this.var_)
                   .append(',')
                   .append(varr)
@@ -686,14 +686,14 @@ public class DomElement {
           }
           if (!this.childrenToSave_.isEmpty()) {
             this.declare(out);
-            out.append("Wt4_11_1").append(".saveReparented(").append(this.var_).append(");");
+            out.append("Wt4.11.2").append(".saveReparented(").append(this.var_).append(");");
           }
           for (int i = 0; i < this.childrenToSave_.size(); ++i) {
             out.append("var c")
                 .append(this.var_)
                 .append((int) i)
                 .append('=')
-                .append("Wt4_11_1.$('")
+                .append("Wt4.11.2.$('")
                 .append(this.childrenToSave_.get(i))
                 .append("')");
             if (app.getEnvironment().agentIsIE()) {
@@ -715,7 +715,7 @@ public class DomElement {
           }
           this.renderInnerHtmlJS(out, app);
           for (int i = 0; i < this.childrenToSave_.size(); ++i) {
-            out.append("Wt4_11_1.replaceWith('")
+            out.append("Wt4.11.2.replaceWith('")
                 .append(this.childrenToSave_.get(i))
                 .append("',c")
                 .append(this.var_)
@@ -902,6 +902,7 @@ public class DomElement {
         Map.Entry<String, DomElement.EventHandler> i = i_it.next();
         if (i.getValue().jsCode.length() != 0) {
           if (this.globalUnfocused_
+              || app.getEnvironment().getServer().getConfiguration().isUseScriptNonce()
               || i.getKey() == WInteractWidget.WHEEL_SIGNAL
                   && app.getEnvironment().agentIsIE()
                   && (int) app.getEnvironment().getAgent().getValue()
@@ -1106,7 +1107,7 @@ public class DomElement {
     if (this.var_.length() == 0) {
       out.append("var ")
           .append(this.getCreateVar())
-          .append("=Wt4_11_1.$('")
+          .append("=Wt4.11.2.$('")
           .append(this.id_)
           .append("');\n");
     }
@@ -1351,7 +1352,7 @@ public class DomElement {
     DomElement.EventHandler keypress = this.eventHandlers_.get(S_keypress);
     if (keypress != null && keypress.jsCode.length() != 0) {
       MapUtils.access(self.eventHandlers_, S_keypress, DomElement.EventHandler.class).jsCode =
-          "if (Wt4_11_1.isKeyPress(event)){"
+          "if (Wt4.11.2.isKeyPress(event)){"
               + MapUtils.access(self.eventHandlers_, S_keypress, DomElement.EventHandler.class)
                   .jsCode
               + '}';
@@ -1367,7 +1368,7 @@ public class DomElement {
       if (minw != null || maxw != null) {
         if (w == null) {
           StringBuilder expr = new StringBuilder();
-          expr.append("Wt4_11_1.IEwidth(this,");
+          expr.append("Wt4.11.2.IEwidth(this,");
           if (minw != null) {
             expr.append('\'').append(minw).append('\'');
             self.properties_.remove(Property.StyleMinWidth);
@@ -1406,7 +1407,7 @@ public class DomElement {
           if (this.willRenderInnerHtmlJS(app)) {
             break;
           }
-          out.append("Wt4_11_1.setHtml(").append(this.var_).append(',');
+          out.append("Wt4.11.2.setHtml(").append(this.var_).append(',');
           if (!pushed) {
             escaped.pushEscape(EscapeOStream.RuleSet.JsStringLiteralSQuote);
             pushed = true;
@@ -1620,9 +1621,30 @@ public class DomElement {
       this.renderInnerHtmlJS(out, app);
       this.renderDeferredJavaScript(out);
     } else {
-      out.append("document.createElement('")
-          .append(elementNames_[(int) this.type_.getValue()])
-          .append("');");
+      out.append("document.createElement('");
+      if (this.type_ == DomElementType.OTHER) {
+        boolean foundTag = false;
+        for (int i = 0; safeElementNames_[i].length() != 0; ++i) {
+          if (safeElementNames_[i].equals(this.elementTagName_)) {
+            foundTag = true;
+            break;
+          }
+        }
+        if (foundTag) {
+          out.append(this.elementTagName_);
+        } else {
+          logger.warn(
+              new StringWriter()
+                  .append(
+                      "DomElement::createElement(): Cannot create custom ('OTHER') element with tag '"
+                          + this.elementTagName_
+                          + "'")
+                  .toString());
+        }
+      } else {
+        out.append(elementNames_[(int) this.type_.getValue()]);
+      }
+      out.append("');");
       out.append(domInsertJS);
       this.asJavaScript(out, DomElement.Priority.Create);
       this.asJavaScript(out, DomElement.Priority.Update);
@@ -1645,7 +1667,7 @@ public class DomElement {
       StringBuilder insertJS = new StringBuilder();
       if (pos != -1) {
         insertJS
-            .append("Wt4_11_1.insertAt(")
+            .append("Wt4.11.2.insertAt(")
             .append(parentVar)
             .append(",")
             .append(this.var_)
@@ -1679,7 +1701,7 @@ public class DomElement {
           || !this.childrenHtml_.isEmpty()
           || innerHTML.length() != 0) {
         this.declare(out);
-        out.append("Wt4_11_1.setHtml(").append(this.var_).append(",'");
+        out.append("Wt4.11.2.setHtml(").append(this.var_).append(",'");
         out.pushEscape(EscapeOStream.RuleSet.JsStringLiteralSQuote);
         List<DomElement.TimeoutEvent> timeouts = new ArrayList<DomElement.TimeoutEvent>();
         EscapeOStream js = new EscapeOStream();
@@ -1837,6 +1859,78 @@ public class DomElement {
     "i",
     "hr",
     "datalist"
+  };
+  private static String[] safeElementNames_ = {
+    "address",
+    "article",
+    "aside",
+    "footer",
+    "header",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "hgroup",
+    "main",
+    "nav",
+    "section",
+    "search",
+    "blockquote",
+    "div",
+    "p",
+    "pre",
+    "hr",
+    "figcaption",
+    "figure",
+    "dd",
+    "dl",
+    "dt",
+    "li",
+    "ul",
+    "ol",
+    "menu",
+    "a",
+    "abbr",
+    "b",
+    "bdi",
+    "bdo",
+    "br",
+    "cite",
+    "code",
+    "data",
+    "dfn",
+    "em",
+    "i",
+    "kdb",
+    "mark",
+    "q",
+    "rp",
+    "rt",
+    "ruby",
+    "s",
+    "samp",
+    "small",
+    "span",
+    "strong",
+    "sub",
+    "sup",
+    "time",
+    "u",
+    "var",
+    "wbr",
+    "caption",
+    "col",
+    "colgroup",
+    "table",
+    "tbody",
+    "td",
+    "tfoot",
+    "th",
+    "thead",
+    "tr",
+    ""
   };
   private static boolean[] defaultInline_ = {
     true, false, true, false, false, false, false, false, false, false, false, false, false, false,

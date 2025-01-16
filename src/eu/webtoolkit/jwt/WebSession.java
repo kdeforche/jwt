@@ -1705,7 +1705,7 @@ class WebSession {
     this.setState(WebSession.State.Loaded, this.controller_.getConfiguration().getSessionTimeout());
     if (wasSuspended) {
       if (this.env_.hasAjax() && this.controller_.getConfiguration().reloadIsNewSession()) {
-        this.app_.doJavaScript("Wt4_11_1.history.removeSessionId()");
+        this.app_.doJavaScript("Wt4.11.2.history.removeSessionId()");
         this.sessionIdInUrl_ = false;
       }
       this.app_.unsuspended().trigger();
@@ -2101,7 +2101,7 @@ class WebSession {
               String hashE = request.getParameter(se + "_");
               if (hashE != null) {
                 this.changeInternalPath(hashE, handler.getResponse());
-                this.app_.doJavaScript("Wt4_11_1.scrollHistory();");
+                this.app_.doJavaScript("Wt4.11.2.scrollHistory();");
               } else {
                 this.changeInternalPath("", handler.getResponse());
               }

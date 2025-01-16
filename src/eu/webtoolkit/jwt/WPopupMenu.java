@@ -171,7 +171,7 @@ public class WPopupMenu extends WMenu {
     this.setOffsets(new WLength(42), EnumSet.of(Side.Left, Side.Top));
     this.setOffsets(new WLength(-10000), EnumSet.of(Side.Left, Side.Top));
     this.doJavaScript(
-        "Wt4_11_1.positionXY('"
+        "Wt4.11.2.positionXY('"
             + this.getId()
             + "',"
             + String.valueOf(p.getX())
@@ -421,7 +421,7 @@ public class WPopupMenu extends WMenu {
 
   String renderRemoveJs(boolean recursive) {
     String result = super.renderRemoveJs(true);
-    result += "Wt4_11_1.remove('" + this.getId() + "');";
+    result += "Wt4.11.2.remove('" + this.getId() + "');";
     return result;
   }
 
@@ -500,7 +500,7 @@ public class WPopupMenu extends WMenu {
     if (!this.cancel_.isConnected()) {
       app.loadJavaScript("js/WPopupMenu.js", wtjs1());
       StringBuilder s = new StringBuilder();
-      s.append("new Wt4_11_1.WPopupMenu(")
+      s.append("new Wt4.11.2.WPopupMenu(")
           .append(app.getJavaScriptClass())
           .append(',')
           .append(this.getJsRef())

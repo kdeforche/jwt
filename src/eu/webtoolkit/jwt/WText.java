@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>
  *
- * @see WApplication#setLocale(Locale locale)
+ * @see WApplication#setLocale(Locale locale, boolean doRefresh)
  */
 public class WText extends WInteractWidget {
   private static Logger logger = LoggerFactory.getLogger(WText.class);

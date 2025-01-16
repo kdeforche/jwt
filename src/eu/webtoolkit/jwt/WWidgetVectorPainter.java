@@ -56,7 +56,7 @@ class WWidgetVectorPainter extends WWidgetPainter {
     if (this.widget_.repaintFlags_.contains(PaintFlag.Update)) {
       DomElement painter =
           DomElement.updateGiven(
-              "Wt4_11_1.getElement('p" + this.widget_.getId() + "').firstChild",
+              "Wt4.11.2.getElement('p" + this.widget_.getId() + "').firstChild",
               DomElementType.DIV);
       painter.setProperty(Property.AddedInnerHTML, vectorDevice.getRendered());
       WApplication app = WApplication.getInstance();

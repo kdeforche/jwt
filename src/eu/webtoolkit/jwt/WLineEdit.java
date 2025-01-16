@@ -338,7 +338,7 @@ public class WLineEdit extends WFormWidget {
     String s = String.valueOf(start);
     String e = String.valueOf(start + length);
     this.doJavaScript(
-        "Wt4_11_1.setUnicodeSelectionRange(" + this.getJsRef() + "," + s + "," + e + ")");
+        "Wt4.11.2.setUnicodeSelectionRange(" + this.getJsRef() + "," + s + "," + e + ")");
   }
   /**
    * Returns the current cursor position.
@@ -747,7 +747,7 @@ public class WLineEdit extends WFormWidget {
     String space = "";
     space += this.spaceChar_;
     String jsObj =
-        "new Wt4_11_1.WLineEdit("
+        "new Wt4.11.2.WLineEdit("
             + app.getJavaScriptClass()
             + ","
             + this.getJsRef()

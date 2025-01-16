@@ -20,12 +20,15 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.EnumSet;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +102,13 @@ public class WRasterPaintDevice extends WResource implements WPaintDevice {
 	public void drawImage(WRectF rect, String imageUri, int imgWidth, int imgHeight, WRectF sourceRect) {
 		processChangeFlags();
 		try {
-			BufferedImage image = ImageIO.read(new File(imageUri));
+			String realImageUri = imageUri;
+			Path p = Paths.get(imageUri);
+			if (!DataUri.isDataUri(imageUri) && !p.isAbsolute()) {
+      			ServletContext context = WApplication.getInstance().getEnvironment().getServer().getServletContext();
+				realImageUri = context.getRealPath(imageUri);
+			}
+			BufferedImage image = ImageIO.read(new File(realImageUri));
 			BufferedImage subImg = image.getSubimage((int)sourceRect.getLeft(), (int)sourceRect.getTop(), (int)sourceRect.getWidth(), (int)sourceRect.getHeight());
 			float xScale = (float)(rect.getWidth() / sourceRect.getWidth());
 			float yScale = (float)(rect.getHeight() / sourceRect.getHeight());

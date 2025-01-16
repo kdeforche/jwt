@@ -74,7 +74,7 @@ class WTimerWidget extends WInteractWidget {
   String renderRemoveJs(boolean recursive) {
     return "{var obj="
         + this.getJsRef()
-        + ";if (obj && obj.timer) {clearTimeout(obj.timer);obj.timer = null;}Wt4_11_1.remove('"
+        + ";if (obj && obj.timer) {clearTimeout(obj.timer);obj.timer = null;}Wt4.11.2.remove('"
         + this.getId()
         + "');}";
   }

@@ -869,7 +869,7 @@ public class WSuggestionPopup extends WPopupWidget {
     String autoSelect = this.isAutoSelectEnabled_ ? "true" : "false";
     this.setJavaScriptMember(
         " WSuggestionPopup",
-        "new Wt4_11_1.WSuggestionPopup("
+        "new Wt4.11.2.WSuggestionPopup("
             + app.getJavaScriptClass()
             + ","
             + this.getJsRef()
@@ -918,7 +918,7 @@ public class WSuggestionPopup extends WPopupWidget {
 
   static String instantiateStdMatcher(final WSuggestionPopup.Options options) {
     StringBuilder s = new StringBuilder();
-    s.append("new Wt4_11_1.WSuggestionPopupStdMatcher(")
+    s.append("new Wt4.11.2.WSuggestionPopupStdMatcher(")
         .append(WWebWidget.jsStringLiteral(options.highlightBeginTag))
         .append(", ")
         .append(WWebWidget.jsStringLiteral(options.highlightEndTag))

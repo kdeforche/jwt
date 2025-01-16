@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.security.SecureRandom;
 import java.util.Map;
+import java.util.Random;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import eu.webtoolkit.jwt.Utils;
 import eu.webtoolkit.jwt.WResource;
 import eu.webtoolkit.jwt.WtServlet;
 import eu.webtoolkit.jwt.servlet.WebRequest.ResponseType;
@@ -44,6 +47,7 @@ public class WebResponse extends HttpServletResponseWrapper {
 	private int id;
 	private ServletOutputStream outputStream;
 	private ResponseType responseType;
+	private String nonce = new String("");
 
 	/**
 	 * Constructor which wraps a HttpServletResponse.
@@ -270,5 +274,26 @@ public class WebResponse extends HttpServletResponseWrapper {
 	 */
 	public ResponseType getResponseType() { 
 		return this.responseType; 
+	}
+	
+	/**
+	 * Returns the nonce in the header.
+	 * 
+	 * @return the nonce that will be used in the header of the response if useScriptNonce is true, otherwise returns an empty String
+	 */
+	public String getNonce() {
+		return this.nonce;
+	}
+
+	void addNonce() {
+		this.nonce = generateNonce();
+		addHeader("Content-Security-Policy", "script-src 'nonce-"+this.nonce+"' 'strict-dynamic' 'unsafe-eval'");
+	}
+
+	private static String generateNonce() {
+		Random r = new SecureRandom();
+		byte[] salt = new byte[16];
+		r.nextBytes(salt);
+		return Utils.base64Encode(new String(salt));
 	}
 }

@@ -58,6 +58,32 @@ class FlexLayoutImpl extends StdLayoutImpl {
     return total + (rowCount - 1) * this.grid_.verticalSpacing_;
   }
 
+  public int getMaximumWidth() {
+    final int colCount = this.grid_.columns_.size();
+    int total = 0;
+    for (int i = 0; i < colCount; ++i) {
+      int colMax = this.maximumWidthForColumn(i);
+      if (colMax == 0) {
+        return 0;
+      }
+      total += colMax;
+    }
+    return total + (colCount - 1) * this.grid_.horizontalSpacing_;
+  }
+
+  public int getMaximumHeight() {
+    final int rowCount = this.grid_.rows_.size();
+    int total = 0;
+    for (int i = 0; i < rowCount; ++i) {
+      int rowMax = this.maximumHeightForRow(i);
+      if (rowMax == 0) {
+        return 0;
+      }
+      total += rowMax;
+    }
+    return total + (rowCount - 1) * this.grid_.verticalSpacing_;
+  }
+
   public void itemAdded(WLayoutItem item) {
     this.addedItems_.add(item);
     this.update();
@@ -86,7 +112,7 @@ class FlexLayoutImpl extends StdLayoutImpl {
     }
     this.addedItems_.clear();
     for (int i = 0; i < this.removedItems_.size(); ++i) {
-      div.callJavaScript("Wt4_11_1.remove('" + this.removedItems_.get(i) + "');", true);
+      div.callJavaScript("Wt4.11.2.remove('" + this.removedItems_.get(i) + "');", true);
     }
     this.removedItems_.clear();
     div.callMethod("layout.adjust()");
@@ -155,7 +181,7 @@ class FlexLayoutImpl extends StdLayoutImpl {
       result.addChild(el);
     }
     StringBuilder js = new StringBuilder();
-    js.append("layout=new Wt4_11_1.FlexLayout(")
+    js.append("layout=new Wt4.11.2.FlexLayout(")
         .append(app.getJavaScriptClass())
         .append(",'")
         .append(this.elId_)
@@ -199,6 +225,54 @@ class FlexLayoutImpl extends StdLayoutImpl {
       }
     }
     return minWidth;
+  }
+
+  private int maximumHeightForRow(int row) {
+    int maxHeight = Integer.MAX_VALUE;
+    boolean isConstrained = false;
+    final int colCount = this.grid_.columns_.size();
+    for (int j = 0; j < colCount; ++j) {
+      WLayoutItem item = this.grid_.items_.get(row).get(j).item_;
+      if (item != null) {
+        int itemMaxHeight = getImpl(item).getMaximumHeight();
+        if (itemMaxHeight > 0) {
+          if (isConstrained) {
+            maxHeight = Math.min(maxHeight, itemMaxHeight);
+          } else {
+            maxHeight = itemMaxHeight;
+            isConstrained = true;
+          }
+        }
+      }
+    }
+    if (!isConstrained) {
+      maxHeight = 0;
+    }
+    return maxHeight;
+  }
+
+  private int maximumWidthForColumn(int col) {
+    int maxWidth = Integer.MAX_VALUE;
+    boolean isConstrained = false;
+    final int rowCount = this.grid_.rows_.size();
+    for (int i = 0; i < rowCount; ++i) {
+      WLayoutItem item = this.grid_.items_.get(i).get(col).item_;
+      if (item != null) {
+        int itemMaxWidth = getImpl(item).getMaximumWidth();
+        if (itemMaxWidth > 0) {
+          if (isConstrained) {
+            maxWidth = Math.min(maxWidth, itemMaxWidth);
+          } else {
+            maxWidth = itemMaxWidth;
+            isConstrained = true;
+          }
+        }
+      }
+    }
+    if (!isConstrained) {
+      maxWidth = 0;
+    }
+    return maxWidth;
   }
 
   private DomElement createElement(

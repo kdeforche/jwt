@@ -10,7 +10,7 @@
   <artifactId>jwt-auth</artifactId>
   <packaging>jar</packaging>
   <name>Java Web Toolkit Authentication Library</name>
-  <version>4.11.1</version>
+  <version>4.11.2</version>
   <description>Authentication library for the Java Web Toolkit</description>
   <url>https://webtoolkit.eu/jwt/</url>
 
@@ -31,7 +31,7 @@
     <dependency>
       <groupId>eu.webtoolkit</groupId>
       <artifactId>jwt</artifactId>
-      <version>4.11.1</version>
+      <version>4.11.2</version>
     </dependency>
 
     <dependency>

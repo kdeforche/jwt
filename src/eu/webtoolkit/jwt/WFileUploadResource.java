@@ -40,7 +40,14 @@ final class WFileUploadResource extends WResource {
     }
     response.setContentType("text/html; charset=utf-8");
     Writer o = response.out();
-    o.append("<!DOCTYPE html><html>\n<head><script type=\"text/javascript\">\nfunction load() { ");
+    o.append("<!DOCTYPE html>")
+        .append("<html>\n")
+        .append("<head><script")
+        .append(" type=\"text/javascript\"");
+    if (response.getNonce().length() != 0) {
+      o.append(" nonce=\"").append(response.getNonce()).append("\"");
+    }
+    o.append(">\n").append("function load() { ");
     if (triggerUpdate || 0 != 0) {
       UserAgent agent = WApplication.getInstance().getEnvironment().getAgent();
       if (triggerUpdate) {

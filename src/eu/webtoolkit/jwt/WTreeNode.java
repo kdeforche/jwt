@@ -156,6 +156,7 @@ public class WTreeNode extends WCompositeWidget {
       }
       this.labelIcon_.setState(this.isExpanded() ? 1 : 0);
     }
+    this.resetLearnedSlots();
   }
   /**
    * Inserts a child node.

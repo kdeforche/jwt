@@ -214,6 +214,23 @@ public abstract class ServletApi {
 	}
 
 	public void doHandleRequest(final WtServlet servlet, final WebRequest request, final WebResponse response) {
+		if (servlet.getConfiguration().isUseScriptNonce()) {
+			try {
+				// Use reflection to bypass accessibility constraint because WebResponse
+				// is in another package and addNonce should not be public.
+				java.lang.reflect.Method addNonce = response.getClass().getDeclaredMethod("addNonce");
+				addNonce.setAccessible(true);
+				addNonce.invoke(response);
+			} catch (NoSuchMethodException e) {
+				// should never happen
+				getLogger().error("NoSuchMethodException occurred when adding nonce header: {}", e.getMessage(), e);
+			} catch (IllegalAccessException e) {
+				// should never happen
+				getLogger().error("IllegalAccessException occurred when adding nonce header: {}", e.getMessage(), e);
+			} catch (Exception e) {
+				getLogger().error("Exception occurred when adding nonce header: {}", e.getMessage(), e);
+			}
+		}
 		if (request.isAsyncSupported()) {
 			request.startAsync();
 			final long asyncContextTimeout = servlet.getConfiguration().getAsyncContextTimeout();

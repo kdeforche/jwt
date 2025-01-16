@@ -66,7 +66,7 @@ class WWidgetCanvasPainter extends WWidgetPainter {
     WApplication app = WApplication.getInstance();
     {
       StringBuilder ss = new StringBuilder();
-      ss.append("new Wt4_11_1.WPaintedWidget(")
+      ss.append("new Wt4.11.2.WPaintedWidget(")
           .append(app.getJavaScriptClass())
           .append(",")
           .append(this.widget_.getJsRef())
@@ -76,7 +76,7 @@ class WWidgetCanvasPainter extends WWidgetPainter {
     String updateAreasJs = "";
     if (hasJsObjects) {
       StringBuilder ss = new StringBuilder();
-      ss.append("new Wt4_11_1.WJavaScriptObjectStorage(")
+      ss.append("new Wt4.11.2.WJavaScriptObjectStorage(")
           .append(app.getJavaScriptClass())
           .append(",")
           .append(this.widget_.getJsRef())

@@ -48,6 +48,22 @@ class FlexItemImpl extends StdLayoutItemImpl implements WWidgetItemImpl {
     }
   }
 
+  public int getMaximumHeight() {
+    if (this.item_.getWidget().isHidden()) {
+      return 0;
+    } else {
+      return (int) this.item_.getWidget().getMaximumHeight().toPixels();
+    }
+  }
+
+  public int getMaximumWidth() {
+    if (this.item_.getWidget().isHidden()) {
+      return 0;
+    } else {
+      return (int) this.item_.getWidget().getMaximumWidth().toPixels();
+    }
+  }
+
   public DomElement createDomElement(
       DomElement parent, boolean fitWidth, boolean fitHeight, WApplication app) {
     WWidget w = this.item_.getWidget();

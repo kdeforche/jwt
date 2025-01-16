@@ -27,6 +27,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import eu.webtoolkit.jwt.servlet.WebResponse;
+
 /**
  * JWt application configuration class.
  * <p>
@@ -169,6 +171,7 @@ public class Configuration {
 
 	private String favicon = "/favicon.ico";
 	private boolean progressiveBootstrap = false;
+	private boolean delayLoadAtBoot = true;
 	
 	private int sessionTimeout = 600;
 	private int idleTimeout = -1;
@@ -179,6 +182,9 @@ public class Configuration {
 	private String uaCompatible = "";
 	private List<MetaHeader> metaHeaders = new ArrayList<MetaHeader>();
 	private List<HeadMatter> headMatter = new ArrayList<HeadMatter>();
+	private boolean useXFrameSameOrigin = true;
+	private List<HttpHeader> httpHeaders = new ArrayList<HttpHeader>();
+	private boolean useScriptNonce = false;
 	private int internalDeploymentSize = 0;
 	private long maxRequestSize = 1024*1024; // 1 Megabyte
 	private long maxFormDataSize = 1024*1024; // 1 Megabyte
@@ -205,6 +211,10 @@ public class Configuration {
 		botList.add(".ia_archiver.*");
 		botList.add(".*Googlebot.*");
 		botList.add(".*Twiceler.*");
+
+		httpHeaders.add(new HttpHeader("X-Content-Type-Options", "nosniff"));
+		httpHeaders.add(new HttpHeader("Strict-Transport-Security", "max-age=15724800; includeSubDomains"));
+		httpHeaders.add(new HttpHeader("Referrer-Policy", "strict-origin-when-cross-origin"));
 	}
 
 	/**
@@ -258,6 +268,8 @@ public class Configuration {
 						}
 					} else if (node.getNodeName().equalsIgnoreCase("progressive-bootstrap")) {
 						setProgressiveBootstrap(parseBoolean(errorMessage, node));
+					} else if (node.getNodeName().equalsIgnoreCase("delay-load-at-boot")) {
+						setDelayLoadAtBoot(parseBoolean(errorMessage, node));
 					} else if (node.getNodeName().equalsIgnoreCase("ua-compatible")) {
 						setUaCompatible(node.getTextContent().trim());
 					} else if (node.getNodeName().equalsIgnoreCase("send-xhtml-mime-type")) {
@@ -295,6 +307,12 @@ public class Configuration {
 								this.allowedOrigins_ = new HashSet<String>();
 							this.allowedOrigins_.add(origin);
 						}
+					} else if (node.getNodeName().equalsIgnoreCase("x-frame-same-origin")) {
+						setUseXFrameSameOrigin(parseBoolean(errorMessage, node));
+					} else if (node.getNodeName().equalsIgnoreCase("http-headers")) {
+						parseHttpHeaders(errorMessage, node);
+					} else if (node.getNodeName().equalsIgnoreCase("use-script-nonce")) {
+						setUseScriptNonce(parseBoolean(errorMessage, node));
 					}
 				}
 			}
@@ -308,6 +326,30 @@ public class Configuration {
 			n = userAgents.item(i);
 			if (n.getNodeName().equals("user-agent")) {
 				list.add(node.getTextContent().trim());
+			}
+		}
+	}
+
+	private void parseHttpHeaders(String errorMessage, Node node) {
+		NodeList httpHeaders = node.getChildNodes();
+		Node n;
+		for (int i = 0; i < httpHeaders.getLength(); i++) {
+			n = httpHeaders.item(i);
+			if (n.getNodeName().equalsIgnoreCase("header")) {
+				Node headerName = n.getAttributes().getNamedItem("name");
+				if (headerName == null) {
+					throw new RuntimeException(errorMessage + "header element must contain a name");
+				}
+				String name = headerName.getTextContent().trim();
+				String content = new String();
+
+				Node headerContent = n.getAttributes().getNamedItem("content");
+				if (headerContent != null) {
+					content = headerContent.getTextContent().trim();
+				}
+
+				HttpHeader header = new HttpHeader(name, content);
+				this.httpHeaders.add(header);
 			}
 		}
 	}
@@ -721,6 +763,29 @@ public class Configuration {
 		return this.progressiveBootstrap ;
 	}
 
+	/**
+	 * Configures whether loading the application is delayed at boot.
+	 *
+	 *	By default, the loading of the application is delayed. This can in 
+	 *	some very specific circumstances lead to the browser waiting several
+	 *	seconds before loading the application. 
+	 *	
+	 *	If this is a bug that you are facing, consider setting this to false.
+	 *	This could however impact your code if you inject JS during boot.
+	 */
+	public void setDelayLoadAtBoot(boolean enable) {
+		this.delayLoadAtBoot = enable;
+	}
+
+	/**
+	 * Returns whether loading of the application is delayed at boot
+	 * 
+	 * @see #setDelayLoadAtBoot(boolean).
+	 */
+	public boolean isDelayLoadAtBoot() {
+		return this.delayLoadAtBoot;
+	}
+
 	public int getKeepAlive() {
 		return getSessionTimeout() / 2;
 	}
@@ -1057,6 +1122,14 @@ public class Configuration {
 	}
 
 	/**
+	 * Returns the headers configured to be sent with every HTTP
+	 * response.
+	 */
+	public List<HttpHeader> getHttpHeaders() {
+		return this.httpHeaders;
+	}
+
+	/**
 	 * Sets (static) meta headers. This is an alternative to using
 	 * {@link WApplication#addMetaHeader(String, CharSequence)}, but having the
 	 * benefit that they are added to all sessions.
@@ -1073,6 +1146,52 @@ public class Configuration {
 		this.headMatter = headMatter;
 	}
 
+	/**
+	 * Sets the headers to send with every HTTP response.
+	 */
+	public void setHttpHeaders(List<HttpHeader> httpHeaders) {
+		this.httpHeaders = httpHeaders;
+	}
+	
+	/**
+	 * Configures whether nonces are used.
+	 * 
+	 * Setting this to true forces every script HTML tag to have the
+	 * same nonce as the one given in the header of the reply in order
+	 * to be executed. This nonce is randomly generated for each reply,
+	 * helping to protect against XSS attacks.
+	 * 
+	 * @see servlet.WebResponse#getNonce()
+	 */
+	public void setUseScriptNonce(boolean enable) {
+		this.useScriptNonce = enable;
+	}
+
+	/**
+	 * Returns whether nonces are used.
+	 */
+	public boolean isUseScriptNonce() {
+		return this.useScriptNonce;
+	}
+
+	/**
+	 * Configures whether the header X-Frame-Option "SAMEORIGIN" is
+	 * sent when serving the main page or the bootstrap.
+	 */
+	public void setUseXFrameSameOrigin(boolean enable) {
+		this.useXFrameSameOrigin = enable;
+	}
+
+	/**
+	 * Returns whether the header X-Frame-Option "SAMEORIGIN" is sent
+	 * when serving the main page or the bootstrap.
+	 * 
+	 * @see #setUseXFrameSameOrigin(boolean)
+	 */
+	public boolean isUseXFrameSameOrigin() {
+		return this.useXFrameSameOrigin;
+	}
+	
 	public boolean isAllowedOrigin(String origin) {
 		if (this.allowedOrigins_.size() == 1 &&
 			"*".equals(this.allowedOrigins_.iterator().next()))

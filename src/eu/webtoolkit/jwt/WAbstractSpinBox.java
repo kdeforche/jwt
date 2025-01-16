@@ -275,7 +275,7 @@ public abstract class WAbstractSpinBox extends WLineEdit {
     WApplication app = WApplication.getInstance();
     app.loadJavaScript("js/WSpinBox.js", wtjs1());
     StringBuilder ss = new StringBuilder();
-    ss.append("new Wt4_11_1.WSpinBox(")
+    ss.append("new Wt4.11.2.WSpinBox(")
         .append(app.getJavaScriptClass())
         .append(",")
         .append(this.getJsRef())

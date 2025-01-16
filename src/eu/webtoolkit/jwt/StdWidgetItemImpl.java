@@ -31,25 +31,25 @@ class StdWidgetItemImpl extends StdLayoutItemImpl implements WWidgetItemImpl {
   public static String getChildrenResizeJS() {
     WApplication app = WApplication.getInstance();
     app.loadJavaScript("js/WtResize.js", wtjs10());
-    return "Wt4_11_1.ChildrenResize";
+    return "Wt4.11.2.ChildrenResize";
   }
 
   public static String getChildrenGetPSJS() {
     WApplication app = WApplication.getInstance();
     app.loadJavaScript("js/WtResize.js", wtjs11());
-    return "Wt4_11_1.ChildrenGetPS";
+    return "Wt4.11.2.ChildrenGetPS";
   }
 
   public static String getSecondResizeJS() {
     WApplication app = WApplication.getInstance();
     app.loadJavaScript("js/WtResize.js", wtjs12());
-    return "Wt4_11_1.LastResize";
+    return "Wt4.11.2.LastResize";
   }
 
   public static String getSecondGetPSJS() {
     WApplication app = WApplication.getInstance();
     app.loadJavaScript("js/WtResize.js", wtjs13());
-    return "Wt4_11_1.LastGetPS";
+    return "Wt4.11.2.LastGetPS";
   }
 
   public String getId() {
@@ -69,6 +69,22 @@ class StdWidgetItemImpl extends StdLayoutItemImpl implements WWidgetItemImpl {
       return 0;
     } else {
       return (int) this.item_.getWidget().getMinimumWidth().toPixels();
+    }
+  }
+
+  public int getMaximumHeight() {
+    if (this.item_.getWidget().isHidden()) {
+      return 0;
+    } else {
+      return (int) this.item_.getWidget().getMaximumHeight().toPixels();
+    }
+  }
+
+  public int getMaximumWidth() {
+    if (this.item_.getWidget().isHidden()) {
+      return 0;
+    } else {
+      return (int) this.item_.getWidget().getMaximumWidth().toPixels();
     }
   }
 

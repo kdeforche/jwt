@@ -187,11 +187,14 @@ class TreesTables extends Topic {
   }
 
   WWidget Tree() {
+    WContainerWidget container = new WContainerWidget();
     WTree tree = new WTree();
+    container.addWidget(tree);
     tree.setSelectionMode(SelectionMode.Extended);
     WIconPair folderIcon =
         new WIconPair("icons/yellow-folder-closed.png", "icons/yellow-folder-open.png", false);
     WTreeNode node = new WTreeNode("Furniture", folderIcon);
+    final WTreeNode furnitureNode = node;
     tree.setTreeRoot(node);
     tree.getTreeRoot().getLabel().setTextFormat(TextFormat.Plain);
     tree.getTreeRoot().setLoadPolicy(ContentLoading.NextLevel);
@@ -208,7 +211,29 @@ class TreesTables extends Topic {
     subtree_.addChildNode(new WTreeNode("Dopey"));
     subtree_.addChildNode(new WTreeNode("Bashful"));
     subtree_.addChildNode(new WTreeNode("Sleepy"));
-    return tree;
+    WPushButton imageButton = new WPushButton("Use Image Icons");
+    container.addWidget(imageButton);
+    imageButton
+        .clicked()
+        .addListener(
+            this,
+            () -> {
+              WIconPair icon =
+                  new WIconPair(
+                      "icons/yellow-folder-closed.png", "icons/yellow-folder-open.png", false);
+              furnitureNode.setLabelIcon(icon);
+            });
+    WPushButton FAButton = new WPushButton("Use Font-Awesome Icons");
+    container.addWidget(FAButton);
+    FAButton.clicked()
+        .addListener(
+            this,
+            () -> {
+              WIconPair icon = new WIconPair("folder", "folder-open", false);
+              icon.setIconsType(WIconPair.IconType.IconName);
+              furnitureNode.setLabelIcon(icon);
+            });
+    return container;
   }
 
   static WTreeTableNode addNode(

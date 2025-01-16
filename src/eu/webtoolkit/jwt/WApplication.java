@@ -85,7 +85,7 @@ import org.slf4j.LoggerFactory;
  *   <li>support for server-initiated updates with {@link WApplication#enableUpdates(boolean
  *       enabled) enableUpdates()}
  *   <li>localization information and message resources bundles, with {@link
- *       WApplication#setLocale(Locale locale) setLocale()} and {@link
+ *       WApplication#setLocale(Locale locale, boolean doRefresh) setLocale()} and {@link
  *       WApplication#setLocalizedStrings(WLocalizedStrings translator) setLocalizedStrings()}
  * </ul>
  */
@@ -896,8 +896,9 @@ public class WApplication extends WObject {
    *
    * <p>By passing an empty <code>locale</code>, the default locale is chosen.
    *
-   * <p>When the locale is changed, {@link WApplication#refresh() refresh()} is called, which will
-   * resolve the strings of the current user-interface in the new locale.
+   * <p>By default, when the locale is changed, {@link WApplication#refresh() refresh()} is called,
+   * which will resolve the strings of the current user-interface in the new locale. This can be
+   * changed by having the <code>doRefresh</code> parameter set to <code>false</code>.
    *
    * <p>At construction, the locale is copied from the environment ({@link
    * WEnvironment#getLocale()}), and this is the locale that was configured by the user in his
@@ -908,18 +909,22 @@ public class WApplication extends WObject {
    * @see WApplication#getLocalizedStrings()
    * @see WString#tr(String key)
    */
-  public void setLocale(final Locale locale) {
+  public void setLocale(final Locale locale, boolean doRefresh) {
     this.locale_ = locale;
     this.localeChanged_ = true;
-    this.refresh();
+    if (doRefresh) {
+      this.refresh();
+    }
   }
   /**
-   * Returns the current locale.
+   * Changes the locale.
    *
-   * <p>
-   *
-   * @see WApplication#setLocale(Locale locale)
+   * <p>Calls {@link #setLocale(Locale locale, boolean doRefresh) setLocale(locale, true)}
    */
+  public final void setLocale(final Locale locale) {
+    setLocale(locale, true);
+  }
+  /** Returns the current locale. */
   public Locale getLocale() {
     return this.locale_;
   }
@@ -2261,9 +2266,9 @@ public class WApplication extends WObject {
     if (this.loadingIndicator_ != null) {
       this.domRoot_.addWidget(indicator);
       this.showLoadJS.setJavaScript(
-          "function(o,e) {Wt4_11_1.inline('" + this.loadingIndicator_.getId() + "');}");
+          "function(o,e) {Wt4.11.2.inline('" + this.loadingIndicator_.getId() + "');}");
       this.hideLoadJS.setJavaScript(
-          "function(o,e) {Wt4_11_1.hide('" + this.loadingIndicator_.getId() + "');}");
+          "function(o,e) {Wt4.11.2.hide('" + this.loadingIndicator_.getId() + "');}");
       this.loadingIndicator_.hide();
     }
   }
@@ -2669,7 +2674,7 @@ public class WApplication extends WObject {
       this.domRoot2_.enableAjax();
     }
     this.doJavaScript(
-        "Wt4_11_1.ajaxInternalPaths("
+        "Wt4.11.2.ajaxInternalPaths("
             + WWebWidget.jsStringLiteral(this.resolveRelativeUrl(this.getBookmarkUrl("/")))
             + ");");
   }
@@ -3047,7 +3052,7 @@ public class WApplication extends WObject {
       String scope =
           preamble.scope == JavaScriptScope.ApplicationScope
               ? this.getJavaScriptClass()
-              : "Wt4_11_1";
+              : "Wt4.11.2";
       if (preamble.type == JavaScriptObjectType.JavaScriptFunction) {
         out.append(scope)
             .append('.')

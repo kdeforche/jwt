@@ -148,7 +148,11 @@ class WebRenderer implements SlotLearnerInterface {
   public void letReloadHTML(final WebResponse response, boolean newSession) throws IOException {
     this.addNoCacheHeaders(response);
     this.setHeaders(response, "text/html; charset=UTF-8");
-    response.out().append("<html><script type=\"text/javascript\">");
+    response
+        .out()
+        .append("<html><script type=\"text/javascript\" nonce=\"")
+        .append(response.getNonce())
+        .append("\">");
     this.letReloadJS(response, newSession, true);
     response.out().append("</script><body></body></html>");
   }
@@ -508,7 +512,7 @@ class WebRenderer implements SlotLearnerInterface {
         "SHOW_ERROR", conf.getErrorReporting() == Configuration.ErrorReporting.ErrorMessage);
     script.setCondition("UGLY_INTERNAL_PATHS", this.session_.isUseUglyInternalPaths());
     script.setCondition("DYNAMIC_JS", false);
-    script.setVar("WT_CLASS", "Wt4_11_1");
+    script.setVar("WT_CLASS", "Wt4.11.2");
     script.setVar("APP_CLASS", app.getJavaScriptClass());
     script.setCondition("STRICTLY_SERIALIZED_EVENTS", conf.serializedEvents());
     script.setCondition("WEB_SOCKETS", conf.webSockets());
@@ -569,18 +573,18 @@ class WebRenderer implements SlotLearnerInterface {
         boolean enabledAjax = app.enableAjax_;
         if (app.enableAjax_) {
           this.collectedJS1_
-              .append("var form = Wt4_11_1.getElement('Wt-form'); if (form) {")
+              .append("var form = Wt4.11.2.getElement('Wt-form'); if (form) {")
               .append(this.beforeLoadJS_.toString());
           this.beforeLoadJS_.setLength(0);
           this.collectedJS1_
               .append("var domRoot=")
               .append(app.domRoot_.getJsRef())
               .append(';')
-              .append("Wt4_11_1.progressed(domRoot);");
+              .append("Wt4.11.2.progressed(domRoot);");
           int librariesLoaded = this.loadScriptLibraries(this.collectedJS1_, app);
           app.streamBeforeLoadJavaScript(this.collectedJS1_, false);
           this.collectedJS2_
-              .append("Wt4_11_1.resolveRelativeAnchors();")
+              .append("Wt4.11.2.resolveRelativeAnchors();")
               .append("domRoot.style.visibility = 'visible';")
               .append(app.getJavaScriptClass())
               .append("._p_.doAutoJavaScript();");
@@ -633,7 +637,7 @@ class WebRenderer implements SlotLearnerInterface {
               .append("}, 400);")
               .append("else ");
         }
-        out.append("Wt4_11_1.ready(function() { ")
+        out.append("Wt4.11.2.ready(function() { ")
             .append(app.getJavaScriptClass())
             .append("._p_.load(true);});\n");
       }
@@ -644,7 +648,7 @@ class WebRenderer implements SlotLearnerInterface {
   private void serveBootstrap(final WebResponse response) throws IOException {
     final Configuration conf = this.session_.getController().getConfiguration();
     FileServe boot = new FileServe(WtServlet.Boot_html);
-    this.setPageVars(boot);
+    this.setPageVars(boot, response.getNonce());
     StringBuilder noJsRedirectUrl = new StringBuilder();
     DomElement.htmlAttributeValue(
         noJsRedirectUrl,
@@ -665,7 +669,9 @@ class WebRenderer implements SlotLearnerInterface {
             + String.valueOf(this.pageId_));
     boot.setVar("BOOT_STYLE_URL", bootStyleUrl.toString());
     this.addNoCacheHeaders(response);
-    response.addHeader("X-Frame-Options", "SAMEORIGIN");
+    if (conf.isUseXFrameSameOrigin()) {
+      response.addHeader("X-Frame-Options", "SAMEORIGIN");
+    }
     String contentType = "text/html; charset=UTF-8";
     this.setHeaders(response, contentType);
     StringBuilder out = new StringBuilder();
@@ -723,6 +729,9 @@ class WebRenderer implements SlotLearnerInterface {
       String url = app.scriptLibraries_.get(i).uri;
       styleSheets.append("<script src=");
       DomElement.htmlAttributeValue(styleSheets, this.session_.fixRelativeUrl(url));
+      if (conf.isUseScriptNonce()) {
+        styleSheets.append(" nonce=\"").append(response.getNonce()).append("\"");
+      }
       styleSheets.append("></script>\n");
       this.beforeLoadJS_.append(app.scriptLibraries_.get(i).beforeLoadJS);
     }
@@ -730,7 +739,7 @@ class WebRenderer implements SlotLearnerInterface {
     app.newBeforeLoadJavaScript_ = app.beforeLoadJavaScript_.length();
     boolean hybridPage = this.session_.isProgressiveBoot() || this.session_.getEnv().hasAjax();
     FileServe page = new FileServe(hybridPage ? WtServlet.Hybrid_html : WtServlet.Plain_html);
-    this.setPageVars(page);
+    this.setPageVars(page, response.getNonce());
     page.setVar("SESSION_ID", this.session_.getSessionId());
     String url =
         app.getEnvironment().agentIsSpiderBot() || !this.session_.isUseUrlRewriting()
@@ -751,7 +760,9 @@ class WebRenderer implements SlotLearnerInterface {
     app.titleChanged_ = false;
     String contentType = "text/html; charset=UTF-8";
     this.addNoCacheHeaders(response);
-    response.addHeader("X-Frame-Options", "SAMEORIGIN");
+    if (conf.isUseXFrameSameOrigin()) {
+      response.addHeader("X-Frame-Options", "SAMEORIGIN");
+    }
     this.setHeaders(response, contentType);
     this.currentFormObjectsList_ = this.createFormObjectsList(app);
     if (hybridPage) {
@@ -919,7 +930,7 @@ class WebRenderer implements SlotLearnerInterface {
     if (widgetset) {
       String historyE = app.getEnvironment().getParameter("Wt-history");
       if (historyE != null) {
-        out.append("Wt4_11_1")
+        out.append("Wt4.11.2")
             .append(".history.initialize('")
             .append(historyE.charAt(0))
             .append("-field', '")
@@ -937,7 +948,7 @@ class WebRenderer implements SlotLearnerInterface {
       out.append("};\n");
     }
     this.renderSetServerPush(out);
-    out.append("Wt4_11_1.ready(function() { ")
+    out.append("Wt4.11.2.ready(function() { ")
         .append(app.getJavaScriptClass())
         .append("._p_.load(")
         .append(!widgetset)
@@ -1169,7 +1180,7 @@ class WebRenderer implements SlotLearnerInterface {
 
   private void loadStyleSheet(
       final StringBuilder out, WApplication app, final WLinkedCssStyleSheet sheet) {
-    out.append("Wt4_11_1")
+    out.append("Wt4.11.2")
         .append(".addStyleSheet('")
         .append(sheet.getLink().resolveUrl(app))
         .append("', '")
@@ -1188,7 +1199,7 @@ class WebRenderer implements SlotLearnerInterface {
 
   private void removeStyleSheets(final StringBuilder out, WApplication app) {
     for (int i = (int) app.styleSheetsToRemove_.size() - 1; i > -1; --i) {
-      out.append("Wt4_11_1")
+      out.append("Wt4.11.2")
           .append(".removeStyleSheet('")
           .append(app.styleSheetsToRemove_.get(i).getLink().resolveUrl(app))
           .append("');\n ");
@@ -1379,8 +1390,9 @@ class WebRenderer implements SlotLearnerInterface {
     app.renderedInternalPath_ = app.newInternalPath_;
   }
 
-  private void setPageVars(final FileServe page) {
+  private void setPageVars(final FileServe page, final String nonce) {
     WApplication app = this.session_.getApp();
+    final Configuration conf = this.session_.getController().getConfiguration();
     page.setVar("DOCTYPE", this.session_.getDocType());
     String htmlAttr = "";
     if (app != null && app.htmlClass_.length() != 0) {
@@ -1420,6 +1432,15 @@ class WebRenderer implements SlotLearnerInterface {
     page.setCondition(
         "FORM", !this.session_.getEnv().agentIsSpiderBot() && !this.session_.getEnv().hasAjax());
     page.setCondition("BOOT_STYLE", true);
+    page.setCondition("USE_NONCE", conf.isUseScriptNonce());
+    page.setVar("NONCE", nonce);
+    if (conf.isUseScriptNonce() && nonce.length() == 0) {
+      logger.warn(
+          new StringWriter()
+              .append(
+                  "An empty nonce has been defined. This may result in the CSP header not being correctly defined and used.")
+              .toString());
+    }
   }
 
   private void streamBootContent(final WebResponse response, final FileServe boot, boolean hybrid)
@@ -1452,6 +1473,7 @@ class WebRenderer implements SlotLearnerInterface {
           "AJAX_CANONICAL_URL", this.safeJsStringLiteral(this.session_.ajaxCanonicalUrl(response)));
       bootJs.setVar("APP_CLASS", "Wt");
       bootJs.setVar("PATH_INFO", this.safeJsStringLiteral(this.session_.pagePathInfo_));
+      bootJs.setVar("DELAY_LOAD_AT_BOOT", conf.isDelayLoadAtBoot());
       bootJs.setCondition("COOKIE_CHECKS", conf.isCookieChecks());
       bootJs.setCondition("HYBRID", hybrid);
       bootJs.setCondition("PROGRESS", hybrid && !this.session_.getEnv().hasAjax());

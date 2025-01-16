@@ -259,7 +259,7 @@ public class WTransform extends WJavaScriptExposableObject {
         o = p;
       }
       result.assignBinding(
-          o, "Wt4_11_1.gfxUtils.transform_mult(" + this.getJsRef() + ',' + p.getJsRef() + ')');
+          o, "Wt4.11.2.gfxUtils.transform_mult(" + this.getJsRef() + ',' + p.getJsRef() + ')');
     }
     return result;
   }
@@ -316,7 +316,7 @@ public class WTransform extends WJavaScriptExposableObject {
         o = rect;
       }
       result.assignBinding(
-          o, "Wt4_11_1.gfxUtils.transform_mult(" + this.getJsRef() + ',' + rect.getJsRef() + ')');
+          o, "Wt4.11.2.gfxUtils.transform_mult(" + this.getJsRef() + ',' + rect.getJsRef() + ')');
     }
     return result;
   }
@@ -343,7 +343,7 @@ public class WTransform extends WJavaScriptExposableObject {
         o = path;
       }
       result.assignBinding(
-          o, "Wt4_11_1.gfxUtils.transform_apply(" + this.getJsRef() + ',' + path.getJsRef() + ')');
+          o, "Wt4.11.2.gfxUtils.transform_apply(" + this.getJsRef() + ',' + path.getJsRef() + ')');
     }
     final List<WPainterPath.Segment> sourceSegments = path.getSegments();
     for (int i = 0; i < sourceSegments.size(); ++i) {
@@ -472,7 +472,7 @@ public class WTransform extends WJavaScriptExposableObject {
       } else {
         this.assignBinding(
             o,
-            "Wt4_11_1.gfxUtils.transform_mult((function(){var p="
+            "Wt4.11.2.gfxUtils.transform_mult((function(){var p="
                 + p.getJsRef()
                 + ";return [1,0,0,1,p[0],p[1]];})(),("
                 + refBefore
@@ -496,7 +496,7 @@ public class WTransform extends WJavaScriptExposableObject {
         o = Y;
       }
       this.assignBinding(
-          o, "Wt4_11_1.gfxUtils.transform_mult(" + this.getJsRef() + ',' + Y.getJsRef() + ')');
+          o, "Wt4.11.2.gfxUtils.transform_mult(" + this.getJsRef() + ',' + Y.getJsRef() + ')');
     }
     double z11 = X.m_[M11] * Y.m_[M11] + X.m_[M12] * Y.m_[M21];
     double z12 = X.m_[M11] * Y.m_[M12] + X.m_[M12] * Y.m_[M22];
@@ -535,7 +535,7 @@ public class WTransform extends WJavaScriptExposableObject {
             this.getM32() * this.getM21() - this.getM31() * this.getM22(),
             -(this.getM32() * this.getM11() - this.getM31() * this.getM12()));
     if (this.isJavaScriptBound()) {
-      res.assignBinding(this, "Wt4_11_1.gfxUtils.transform_adjoint(" + this.getJsRef() + ")");
+      res.assignBinding(this, "Wt4.11.2.gfxUtils.transform_adjoint(" + this.getJsRef() + ")");
     }
     return res;
   }
@@ -558,7 +558,7 @@ public class WTransform extends WJavaScriptExposableObject {
               adj.getM31() / det,
               adj.getM32() / det);
       if (this.isJavaScriptBound()) {
-        res.assignBinding(this, "Wt4_11_1.gfxUtils.transform_inverted(" + this.getJsRef() + ")");
+        res.assignBinding(this, "Wt4.11.2.gfxUtils.transform_inverted(" + this.getJsRef() + ")");
       }
       return res;
     } else {

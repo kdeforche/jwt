@@ -667,7 +667,7 @@ public class WLeafletMap extends WCompositeWidget {
     String optionsStr = this.options_.toString();
     StringBuilder ss = new StringBuilder();
     EscapeOStream es = new EscapeOStream(ss);
-    es.append("new Wt4_11_1.WLeafletMap(")
+    es.append("new Wt4.11.2.WLeafletMap(")
         .append(app.getJavaScriptClass())
         .append(",")
         .append(this.getJsRef())

@@ -267,7 +267,7 @@ public class WEmailEdit extends WFormWidget {
     super.render(flags);
     WApplication app = WApplication.getInstance();
     app.loadJavaScript("js/WEmailEdit.js", wtjs1());
-    super.setJavaScriptMember("wtEncodeValue", "Wt4_11_1.encodeEmailValue");
+    super.setJavaScriptMember("wtEncodeValue", "Wt4.11.2.encodeEmailValue");
   }
 
   void updateDom(final DomElement element, boolean all) {

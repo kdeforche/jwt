@@ -141,10 +141,10 @@ public class WBootstrap5Theme extends WTheme {
         {
           WApplication app = WApplication.getInstance();
           WIconPair iconPair = ObjectUtils.cast(child, WIconPair.class);
-          iconPair.getIcon1().setInline(false);
-          iconPair.getIcon1().setImageLink(new WLink(app.getOnePixelGifUrl()));
-          iconPair.getIcon2().setInline(false);
-          iconPair.getIcon2().setImageLink(new WLink(app.getOnePixelGifUrl()));
+          iconPair.getUriIcon1().setInline(false);
+          iconPair.getUriIcon1().setImageLink(new WLink(app.getOnePixelGifUrl()));
+          iconPair.getUriIcon2().setInline(false);
+          iconPair.getUriIcon2().setImageLink(new WLink(app.getOnePixelGifUrl()));
           iconPair.addStyleClass("Wt-collapse-button");
           break;
         }
@@ -470,7 +470,7 @@ public class WBootstrap5Theme extends WTheme {
     app.loadJavaScript("js/BootstrapValidate.js", wtjs2());
     if (app.getEnvironment().hasAjax()) {
       StringBuilder js = new StringBuilder();
-      js.append("Wt4_11_1.setValidationState(")
+      js.append("Wt4.11.2.setValidationState(")
           .append(widget.getJsRef())
           .append(",")
           .append(validation.getState() == ValidationState.Valid)

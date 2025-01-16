@@ -25,6 +25,8 @@ import javax.servlet.http.*;
  * another where only directories can be selected.
  */
 public enum FilePickerType {
+  /** No file picker. */
+  None,
   /** Only files can be selected. */
   FileSelection,
   /** Only directories can be selected. */

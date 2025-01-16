@@ -570,6 +570,14 @@ public class WFileDropWidget extends WContainerWidget {
     this.acceptDirectories_ = enable;
     this.acceptDirectoriesRecursive_ = recursive;
     this.updateFlags_.set(BIT_ACCEPTDROPS_CHANGED);
+    if (!this.acceptDirectories_ && this.onClickFilePicker_ == FilePickerType.DirectorySelection) {
+      logger.warn(
+          new StringWriter()
+              .append(
+                  "setAcceptDirectories: Reverting the onClickFilePicker to FileSelection since this widget no longer accepts directories.")
+              .toString());
+      this.setOnClickFilePicker(FilePickerType.FileSelection);
+    }
     this.repaint();
   }
   /**
@@ -600,9 +608,24 @@ public class WFileDropWidget extends WContainerWidget {
    * Set the type of file picker that is opened when a user clicks the widget.
    *
    * <p>The default is {@link FilePickerType#FileSelection}.
+   *
+   * <p>When {@link FilePickerType#None} is passed, no file picker will be shown. Files or
+   * directories can still be dropped in, if {@link WFileDropWidget#setAcceptDrops(boolean enable)
+   * setAcceptDrops()} is set to <code>true</code> (which by default it is). Also note that in this
+   * case, the methods {@link WFileDropWidget#openFilePicker() openFilePicker()} and {@link
+   * WFileDropWidget#openDirectoryPicker() openDirectoryPicker()} can still be used to open a picker
+   * by redirecting clicks from other buttons.
    */
   public void setOnClickFilePicker(FilePickerType type) {
     if (this.onClickFilePicker_ == type) {
+      return;
+    }
+    if (type == FilePickerType.DirectorySelection && !this.acceptDirectories_) {
+      logger.error(
+          new StringWriter()
+              .append(
+                  "setOnClickFilePicker: Cannot configure directory filepicker because this widget does not accept directories.")
+              .toString());
       return;
     }
     this.onClickFilePicker_ = type;
@@ -726,7 +749,7 @@ public class WFileDropWidget extends WContainerWidget {
     if (this.isRendered()) {
       String result = this.getJsRef() + ".destructor();";
       if (!recursive) {
-        result += "Wt4_11_1.remove('" + this.getId() + "');";
+        result += "Wt4.11.2.remove('" + this.getId() + "');";
       }
       return result;
     } else {
@@ -785,10 +808,21 @@ public class WFileDropWidget extends WContainerWidget {
             this.getJsRef() + ".setChunkSize(" + String.valueOf(this.chunkSize_) + ");");
       }
       if (this.updateFlags_.get(BIT_ONCLICKFILEPICKER_CHANGED) || all) {
-        String type =
-            this.onClickFilePicker_ == FilePickerType.FileSelection
-                ? "file-selection"
-                : "directory-selection";
+        String type = "file-selection";
+        if (this.onClickFilePicker_ == FilePickerType.None) {
+          type = "none";
+        } else {
+          if (this.onClickFilePicker_ == FilePickerType.DirectorySelection) {
+            type = "directory-selection";
+          } else {
+            if (this.onClickFilePicker_ != FilePickerType.FileSelection) {
+              logger.warn(
+                  new StringWriter()
+                      .append("Unknown FilePickerType, falling back to FileSelection.")
+                      .toString());
+            }
+          }
+        }
         this.doJavaScript(this.getJsRef() + ".setOnClickFilePicker(\"" + type + "\");");
       }
       this.updateFlags_.clear();
@@ -848,7 +882,7 @@ public class WFileDropWidget extends WContainerWidget {
     String maxFileSize = String.valueOf(WApplication.getInstance().getMaximumRequestSize());
     this.setJavaScriptMember(
         " WFileDropWidget",
-        "new Wt4_11_1.WFileDropWidget("
+        "new Wt4.11.2.WFileDropWidget("
             + app.getJavaScriptClass()
             + ","
             + this.getJsRef()
@@ -1162,7 +1196,7 @@ public class WFileDropWidget extends WContainerWidget {
         JavaScriptScope.WtClassScope,
         JavaScriptObjectType.JavaScriptConstructor,
         "WFileDropWidget",
-        "(function(e,t,n){t.wtLObj=this;const i=this,o=e.WT;let s=\"Wt-dropzone-hover\";const r=\"Wt-dropzone-indication\",l=\"Wt-dropzone-dragstyle\",d=[];let a=!1,c=!0,u=!1,f=!1,p=!1,h=!1,m=null,y=0,g=0;const v=document.createElement(\"input\");v.type=\"file\";v.setAttribute(\"multiple\",\"multiple\");v.style.display=\"none\";t.hiddenInput=v;t.appendChild(v);const w=document.createElement(\"input\");w.type=\"file\";w.setAttribute(\"multiple\",\"multiple\");w.style.display=\"none\";window.document.body.appendChild(w);t.serverFileInput=w;const k=document.createElement(\"input\");k.type=\"file\";k.setAttribute(\"multiple\",\"multiple\");k.setAttribute(\"webkitdirectory\",\"webkitdirectory\");k.style.display=\"none\";window.document.body.appendChild(k);t.serverDirInput=k;const b=document.createElement(\"div\");b.classList.add(\"Wt-dropcover\");document.body.appendChild(b);this.validFileCheck=function(e,t,n){const i=new FileReader;i.onload=function(){t(!0,n,e)};i.onerror=function(){t(!1,n,e)};i.readAsText(e.file.slice(0,32))};t.setAcceptDrops=function(e){c=e};t.setAcceptDirectories=function(e,t){u=e;f=t};t.setDropIndication=function(e){p=e};t.setDropForward=function(e){h=e};t.ondragenter=function(e){if(c){if(function(e){const t=e.dataTransfer?.items??null,n=null!==t&&Array.prototype.some.call(t,(e=>\"file\"===e.kind)),i=e.dataTransfer?.types??null,o=null!==i&&i.includes(\"Files\");return n||o}(e)){0===g&&i.setPageHoverStyle();g=2;i.setWidgetHoverStyle(!0)}e.stopPropagation()}};t.ondragleave=function(e){const t=e.clientX,n=e.clientY;let o=document.elementFromPoint(t,n);0===t&&0===n&&(o=null);if(o!==b)i.resetDragDrop();else{i.setWidgetHoverStyle(!1);g=1}};t.ondragover=function(e){e.preventDefault()};const F=function(e){if((p||h)&&\"none\"!==o.css(t,\"display\")&&c){g=1;i.setPageHoverStyle()}};document.body.addEventListener(\"dragenter\",F);b.ondragover=function(e){e.preventDefault();e.stopPropagation()};b.ondragleave=function(e){c&&1===g&&i.resetDragDrop()};b.ondrop=function(e){e.preventDefault();h?t.ondrop(e):i.resetDragDrop()};t.ondrop=function(e){e.preventDefault();if(c){i.resetDragDrop();0!==e.dataTransfer.files.length&&i.addDataTransferItems(Array.from(e.dataTransfer.items))}};this.addDataTransferItems=async function(n){const i=[],o=n.map((e=>e.webkitGetAsEntry()));for(const e of o){const t=D(e);if(e.isFile){const n=await C(e);t.type=n.type;t.size=n.size;const i=L(n);t.id=i.id}else if(e.isDirectory){if(!u){console.warn(\"directory drop not enabled, ignoring entry\",e);continue}t.contents=[];await S(e,t,f)}i.push(t)}if(0!==i.length){console.log(\"All newKeys: \",i);e.emit(t,\"dropsignal\",JSON.stringify(i))}};this.addFiles=function(n){const i=[];for(const e of n){const t=L(e),n={};n.id=t.id;n.filename=t.file.name;n.path=t.file.name;n.type=t.file.type;n.size=t.file.size;i.push(n)}e.emit(t,\"dropsignal\",JSON.stringify(i))};async function S(e,t,n){const i=await function(e){return new Promise((t=>{e.createReader().readEntries((function(e){t(e)}))}))}(e);for(let e=0;e<i.length;e++){const o=i[e],s=D(o);if(o.isFile){const e=await C(o);s.type=e.type;s.size=e.size;const t=L(e);s.id=t.id}else if(o.isDirectory){s.contents=[];n&&await S(o,s,n)}t.contents.push(s)}}function D(e){const t={};t.path=e.fullPath;t.filename=e.name;return t}function C(e){return new Promise((t=>{e.file((function(e){t(e)}))}))}function L(e){const t=new Object;t.id=Math.floor(Math.random()*Math.pow(2,31));t.file=e;d.push(t);return t}t.addEventListener(\"click\",(function(){if(c){v.value=\"\";v.click()}}));t.markForSending=function(e){for(const t of e){const e=t.id;for(const t of d)if(t.id===e){t.ready=!0;break}}a||d.length>0&&d[0].ready&&i.requestSend()};this.requestSend=function(){if(d[0].skip)i.uploadFinished(null);else{a=!0;e.emit(t,\"requestsend\",d[0].id)}};t.send=function(o,s){const r=d[0];if(r.file.size>n){e.emit(t,\"filetoolarge\",r.file.size);i.uploadFinished(null)}else if(\"boolean\"==typeof t.wtUseCustomSend){if(\"function\"!=typeof t.wtCustomSend)console.log(\"Warning: wtUseCustomSend is set, but wtCustomSend is not properly defined as a function. Falling back to the default upload mechanism\");else if(t.wtUseCustomSend){i.validFileCheck(r,t.wtCustomSend,o);return}}else{const e=null!==m&&s?i.workerSend:i.actualSend;i.validFileCheck(r,e,o)}};this.actualSend=function(e,t,n){if(!e){i.uploadFinished(null);return}const o=new XMLHttpRequest;o.addEventListener(\"load\",i.uploadFinished);o.addEventListener(\"error\",i.uploadFinished);o.addEventListener(\"abort\",i.uploadFinished);o.addEventListener(\"timeout\",i.uploadFinished);o.open(\"POST\",t);d[0].request=o;const s=new FormData;s.append(\"file-id\",d[0].id);s.append(\"data\",d[0].file);o.send(s)};this.workerSend=function(e,t,n){if(e){m.upload=d[0];m.postMessage({cmd:\"send\",url:t,upload:d[0],chunksize:y})}else i.uploadFinished(null)};this.uploadFinished=function(n){(null!=n&&\"load\"===n.type&&200===n.currentTarget.status||!0===n)&&e.emit(t,\"uploadfinished\",d[0].id);d.splice(0,1);if(d[0]&&d[0].ready)i.requestSend();else{a=!1;e.emit(t,\"donesending\")}};t.cancelUpload=function(e){if(d[0]&&d[0].id===e){d[0].skip=!0;d[0].request?d[0].request.abort():m&&m.upload===d[0]&&m.postMessage({cmd:\"cancel\",upload:d[0]})}else for(let t=1;t<d.length;t++)d[t].id===e&&(d[t].skip=!0)};const W=function(){c&&null!==this.files&&0!==this.files.length&&i.addFiles(this.files)};v.onchange=W;w.onchange=W;k.onchange=function(){if(!c)return;if(null===this.files||0===this.files.length)return;const n=[];for(let e=0;e<this.files.length;e++)E(n,this.files[e]);e.emit(t,\"dropsignal\",JSON.stringify(n))};function E(e,t){const n=t.webkitRelativePath,i=n.split(\"/\");if(!f&&i.length>2)return;let o=null,s=\"\";for(let t=0;t<i.length-1;t++){const n=i[t];s+=\"/\"+n;const r=e.find((e=>e.path===s));if(r)o=r;else{const t={};t.path=s;t.filename=n;t.contents=[];null===o?e.push(t):o.contents.push(t);o=t}e=o.contents}const r={},l=L(t);r.id=l.id;r.path=\"/\"+n;r.filename=t.name;r.type=t.type;r.size=t.size;o.contents.push(r)}this.setPageHoverStyle=function(){if(p||h){b.classList.add(l);t.classList.add(l);p&&t.classList.add(r)}};this.setWidgetHoverStyle=function(e){t.classList.toggle(s,e)};this.resetDragDrop=function(){t.classList.remove(r);t.classList.remove(l);b.classList.remove(l);i.setWidgetHoverStyle(!1);g=0};t.configureHoverClass=function(e){s=e};t.setFilters=function(e){v.setAttribute(\"accept\",e);w.setAttribute(\"accept\",e)};t.setUploadWorker=function(n){if(n&&window.Worker){m=new Worker(n);m.onmessage=function(n){if(n.data.workerfeatures){if(\"valid\"!==n.data.workerfeatures){t.setUploadWorker(null);e.emit(t,\"filternotsupported\")}}else i.uploadFinished(n.data)};m.postMessage({cmd:\"check\"})}else m=null};t.setChunkSize=function(e){y=e};t.destructor=function(){document.body.removeEventListener(\"dragenter\",F);document.body.removeChild(b)};t.setOnClickFilePicker=function(e){if(\"directory-selection\"===e)t.hiddenInput.setAttribute(\"webkitdirectory\",\"webkitdirectory\");else{\"file-selection\"!==e&&console.error(\"unknown filepicker type; using 'file-selection'\",e);t.hiddenInput.removeAttribute(\"webkitdirectory\")}}})");
+        "(function(e,t,n){t.wtLObj=this;const i=this,o=e.WT;let s=\"Wt-dropzone-hover\";const l=\"Wt-dropzone-indication\",r=\"Wt-dropzone-dragstyle\",d=[];let a=!1,c=!0,u=!1,f=!1,p=!1,h=!1,m=\"file-selection\",y=null,g=0,w=0;const v=document.createElement(\"input\");v.type=\"file\";v.setAttribute(\"multiple\",\"multiple\");v.style.display=\"none\";t.hiddenInput=v;t.appendChild(v);const k=document.createElement(\"input\");k.type=\"file\";k.setAttribute(\"multiple\",\"multiple\");k.style.display=\"none\";window.document.body.appendChild(k);t.serverFileInput=k;const b=document.createElement(\"input\");b.type=\"file\";b.setAttribute(\"multiple\",\"multiple\");b.setAttribute(\"webkitdirectory\",\"webkitdirectory\");b.style.display=\"none\";window.document.body.appendChild(b);t.serverDirInput=b;const F=document.createElement(\"div\");F.classList.add(\"Wt-dropcover\");document.body.appendChild(F);this.validFileCheck=function(e,t,n){const i=new FileReader;i.onload=function(){t(!0,n,e)};i.onerror=function(){t(!1,n,e)};i.readAsText(e.file.slice(0,32))};t.setAcceptDrops=function(e){c=e};t.setAcceptDirectories=function(e,t){u=e;f=t};t.setDropIndication=function(e){p=e};t.setDropForward=function(e){h=e};t.ondragenter=function(e){if(c){if(function(e){const t=e.dataTransfer?.items??null,n=null!==t&&Array.prototype.some.call(t,(e=>\"file\"===e.kind)),i=e.dataTransfer?.types??null,o=null!==i&&i.includes(\"Files\");return n||o}(e)){0===w&&i.setPageHoverStyle();w=2;i.setWidgetHoverStyle(!0)}e.stopPropagation()}};t.ondragleave=function(e){const t=e.clientX,n=e.clientY;let o=document.elementFromPoint(t,n);0===t&&0===n&&(o=null);if(o!==F)i.resetDragDrop();else{i.setWidgetHoverStyle(!1);w=1}};t.ondragover=function(e){e.preventDefault()};const S=function(e){if((p||h)&&\"none\"!==o.css(t,\"display\")&&c){w=1;i.setPageHoverStyle()}};document.body.addEventListener(\"dragenter\",S);F.ondragover=function(e){e.preventDefault();e.stopPropagation()};F.ondragleave=function(e){c&&1===w&&i.resetDragDrop()};F.ondrop=function(e){e.preventDefault();h?t.ondrop(e):i.resetDragDrop()};t.ondrop=function(e){e.preventDefault();if(c){i.resetDragDrop();0!==e.dataTransfer.files.length&&i.addDataTransferItems(Array.from(e.dataTransfer.items))}};this.addDataTransferItems=async function(n){const i=[],o=n.map((e=>e.webkitGetAsEntry()));for(const e of o){const t=C(e);if(e.isFile){const n=await L(e);t.type=n.type;t.size=n.size;const i=W(n);t.id=i.id}else if(e.isDirectory){if(!u){console.warn(\"directory drop not enabled, ignoring entry\",e);continue}t.contents=[];await D(e,t,f)}i.push(t)}if(0!==i.length){console.log(\"All newKeys: \",i);e.emit(t,\"dropsignal\",JSON.stringify(i))}};this.addFiles=function(n){const i=[];for(const e of n){const t=W(e),n={};n.id=t.id;n.filename=t.file.name;n.path=t.file.name;n.type=t.file.type;n.size=t.file.size;i.push(n)}e.emit(t,\"dropsignal\",JSON.stringify(i))};async function D(e,t,n){const i=await function(e){return new Promise((t=>{e.createReader().readEntries((function(e){t(e)}))}))}(e);for(let e=0;e<i.length;e++){const o=i[e],s=C(o);if(o.isFile){const e=await L(o);s.type=e.type;s.size=e.size;const t=W(e);s.id=t.id}else if(o.isDirectory){s.contents=[];n&&await D(o,s,n)}t.contents.push(s)}}function C(e){const t={};t.path=e.fullPath;t.filename=e.name;return t}function L(e){return new Promise((t=>{e.file((function(e){t(e)}))}))}function W(e){const t=new Object;t.id=Math.floor(Math.random()*Math.pow(2,31));t.file=e;d.push(t);return t}t.addEventListener(\"click\",(function(){if(c&&\"none\"!==m){v.value=\"\";v.click()}}));t.markForSending=function(e){for(const t of e){const e=t.id;for(const t of d)if(t.id===e){t.ready=!0;break}}a||d.length>0&&d[0].ready&&i.requestSend()};this.requestSend=function(){if(d[0].skip)i.uploadFinished(null);else{a=!0;e.emit(t,\"requestsend\",d[0].id)}};t.send=function(o,s){const l=d[0];if(l.file.size>n){e.emit(t,\"filetoolarge\",l.file.size);i.uploadFinished(null)}else if(\"boolean\"==typeof t.wtUseCustomSend){if(\"function\"!=typeof t.wtCustomSend)console.log(\"Warning: wtUseCustomSend is set, but wtCustomSend is not properly defined as a function. Falling back to the default upload mechanism\");else if(t.wtUseCustomSend){i.validFileCheck(l,t.wtCustomSend,o);return}}else{const e=null!==y&&s?i.workerSend:i.actualSend;i.validFileCheck(l,e,o)}};this.actualSend=function(e,t,n){if(!e){i.uploadFinished(null);return}const o=new XMLHttpRequest;o.addEventListener(\"load\",i.uploadFinished);o.addEventListener(\"error\",i.uploadFinished);o.addEventListener(\"abort\",i.uploadFinished);o.addEventListener(\"timeout\",i.uploadFinished);o.open(\"POST\",t);d[0].request=o;const s=new FormData;s.append(\"file-id\",d[0].id);s.append(\"data\",d[0].file);o.send(s)};this.workerSend=function(e,t,n){if(e){y.upload=d[0];y.postMessage({cmd:\"send\",url:t,upload:d[0],chunksize:g})}else i.uploadFinished(null)};this.uploadFinished=function(n){(null!=n&&\"load\"===n.type&&200===n.currentTarget.status||!0===n)&&e.emit(t,\"uploadfinished\",d[0].id);d.splice(0,1);if(d[0]&&d[0].ready)i.requestSend();else{a=!1;e.emit(t,\"donesending\")}};t.cancelUpload=function(e){if(d[0]&&d[0].id===e){d[0].skip=!0;d[0].request?d[0].request.abort():y&&y.upload===d[0]&&y.postMessage({cmd:\"cancel\",upload:d[0]})}else for(let t=1;t<d.length;t++)d[t].id===e&&(d[t].skip=!0)};const E=function(){c&&null!==this.files&&0!==this.files.length&&i.addFiles(this.files)};v.onchange=E;k.onchange=E;b.onchange=function(){if(!c)return;if(null===this.files||0===this.files.length)return;const n=[];for(let e=0;e<this.files.length;e++)A(n,this.files[e]);e.emit(t,\"dropsignal\",JSON.stringify(n))};function A(e,t){const n=t.webkitRelativePath,i=n.split(\"/\");if(!f&&i.length>2)return;let o=null,s=\"\";for(let t=0;t<i.length-1;t++){const n=i[t];s+=\"/\"+n;const l=e.find((e=>e.path===s));if(l)o=l;else{const t={};t.path=s;t.filename=n;t.contents=[];null===o?e.push(t):o.contents.push(t);o=t}e=o.contents}const l={},r=W(t);l.id=r.id;l.path=\"/\"+n;l.filename=t.name;l.type=t.type;l.size=t.size;o.contents.push(l)}this.setPageHoverStyle=function(){if(p||h){F.classList.add(r);t.classList.add(r);p&&t.classList.add(l)}};this.setWidgetHoverStyle=function(e){t.classList.toggle(s,e)};this.resetDragDrop=function(){t.classList.remove(l);t.classList.remove(r);F.classList.remove(r);i.setWidgetHoverStyle(!1);w=0};t.configureHoverClass=function(e){s=e};t.setFilters=function(e){v.setAttribute(\"accept\",e);k.setAttribute(\"accept\",e)};t.setUploadWorker=function(n){if(n&&window.Worker){y=new Worker(n);y.onmessage=function(n){if(n.data.workerfeatures){if(\"valid\"!==n.data.workerfeatures){t.setUploadWorker(null);e.emit(t,\"filternotsupported\")}}else i.uploadFinished(n.data)};y.postMessage({cmd:\"check\"})}else y=null};t.setChunkSize=function(e){g=e};t.destructor=function(){document.body.removeEventListener(\"dragenter\",S);document.body.removeChild(F)};t.setOnClickFilePicker=function(e){if(\"directory-selection\"===e)t.hiddenInput.setAttribute(\"webkitdirectory\",\"webkitdirectory\");else{t.hiddenInput.removeAttribute(\"webkitdirectory\");if(\"file-selection\"!==e&&\"none\"!==e){console.warn(\"unknown filepicker type; using 'file-selection'\",e);e=\"file-selection\"}}m=e}})");
   }
 
   static List<WFileDropWidget.File> flattenUploadsVector(WFileDropWidget.Directory dir) {

@@ -25,6 +25,110 @@ newer version of JWt. It lists changes in the library that may break
 the way you build JWt, the way you configure JWt or the JWt API and
 behaviour. It also indicates the main changes from version to verison.
 
+<h2>Release 4.11.2 (January 16, 2025)</h2>
+
+<p>
+  JWt 4.11.2 is a patch release that addresses the following issues:
+</p>
+
+<ul>
+  <li>
+    <a href="https://redmine.emweb.be/issues/12935" target="_blank">Issue #12935</a>:
+    resize handles in layouts now have a fixed height or width instead of them scaling with the spacing of the layout.
+  </li>
+  <li>
+    <a href="https://redmine.emweb.be/issues/12866" target="_blank">Issue #12866</a>:
+    added the <a href="eu/webtoolkit/jwt/Configuration.html#setDelayLoadAtBoot(boolean)" target="_blank">setDelayAtBoot()</a> option which can be changed in the <code>Configuration</code>. This option
+    allows developers to choose whether the loading of the application at boot should be delayed or not. Instead of
+    immediately calling the loading method, a small delay is introduced to allow additional JavaScript to be executed before
+    loading. By default this option is set to true, which keeps the delay. This delay can cause the loading of the
+    application to take a long time in some very specific case. Setting this option to false could however impact any
+    JavaScript code added at boot time.
+  </li>
+  <li>
+    <a href="https://redmine.emweb.be/issues/13063" target="_blank">Issue #13063</a>:
+    fixed a bug where setting the HTML tag name of a
+    <a href="eu/webtoolkit/jwt/WWebWidget.html" target="_blank">WWebWidget</a> could lead to a segmentation fault for some tag names.
+  </li>
+  <li>
+    <a href="https://redmine.emweb.be/issues/13366" target="_blank">Issue #13366</a>:
+    ensure that when the application's working directory and the docroot are not the same directory, the image rendering fallback
+    will attempt to resolve the image relative to both locations.
+    This is so that clients that do not have JavaScript enabled, are still able to see the same images as JavaScript-enabled clients.
+  </li>
+  <li>
+    <a href="https://redmine.emweb.be/issues/12860" target="_blank">Issue #12860</a>:
+    fixed a bug where a
+    <a href="eu/webtoolkit/jwt/WDialog.html" target="_blank">WDialog</a> would not be centered if
+    <a href="eu/webtoolkit/jwt/WDialog.html#exec()" target="_blank">WDialog#exec()</a> was called after the <code>WDialog</code> was loaded.
+  </li>
+  <li>
+    <a href="https://redmine.webtoolkit.eu/issues/13082" target="_blank">Issue #13082</a>:
+    fixed styling of elements in layout not being updated in some cases if the change happened while the layout was hidden.
+  </li>
+  <li>
+    <a href="https://redmine.emweb.be/issues/12951" target="_blank">Issue #12951</a>:
+    fixed a bug where a layout in a
+    <a href="eu/webtoolkit/jwt/WPanel.html" target="_blank">WPanel</a> may not work properly during and after some animations.
+  </li>
+  <li>
+    <a href="https://redmine.emweb.be/issues/12934" target="_blank">Issue #12934</a>:
+    fixed a bug in layouts using JavaScript implementation where a widget size could be set higher than it's maximum size, leading to additional space after that widget.
+  </li>
+  <li>
+    <a href="https://redmine.emweb.be/issues/13300" target="_blank">Issue #13300</a>:
+    fixed a missing fallback in JWt's main JavaScript, when handling browser history navigation (using the back and forward buttons).
+    In case of rewritten browser history, the retrieval would fail, and encounter an <code>undefined</code> state. Throwing a JavaScript error. This error should be guarded against,
+    and the fallback should always kick in.
+  </li>
+</ul>
+
+<p>
+  JWt 4.11.2 also comes with the following improvements:
+</p>
+
+<ul>
+  <li>
+    <a href="https://redmine.emweb.be/issues/13187" target="_blank">Issue #13187</a>:
+    add the possibility to configure headers that are sent in every reply. This can be defined in
+    the configuration using the <a href="eu/webtoolkit/jwt/Configuration.html#setHttpHeaders(java.util.list)" target="_blank">Configuration#setHttpHeaders()</a> method.
+    It is now also possible to configure JWt to use nonces for script by setting the <a href="eu/webtoolkit/jwt/Configuration.html#setUseScriptNonce(boolean)" target="_blank">Configuration#setUseScriptNonce()</a> to <code>true</code>,
+    to help protect against XSS attack. If you need to serve a script in a
+    <a href="eu/webtoolkit/jwt/WResource.html" target="_blank">WResource</a>, the nonce is available through the
+    response parameter of the
+    <a href="eu/webtoolkit/jwt/WResource.html##handleRequest(eu.webtoolkit.jwt.servlet.WebRequest,eu.webtoolkit.jwt.servlet.WebResponse)" target="_blank">WResource#handleRequest()</a> function by using
+    <a href="eu/webtoolkit/jwt/servlet/WebResponse.html#getNonce()" target="_blank">WebResponse#getNonce()</a>.
+    The nonce is facilitated through the <h href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP" target="_blank">CSP (Content Security Policy) header</a>.
+    Enabling the nonce will serve CSP headers in your responses. A minimal (fairly nonrestrictive) configuration is taken by default, namely:
+    <code>Content-Security-Policy: script-src 'nonce-{randomNonce}' 'strict-dynamic' 'unsafe-eval'</code>
+    This CSP header can be configured in the Configuration under <code>Configuration#setHttpHeaders()</code> as well. If the nonce is enabled, only MORE restrictive CSP headers will
+    be allowed by the browser.
+  </li>
+  <li>
+    <a href="https://redmine.emweb.be/issues/12945" target="_blank">Issue #12945</a>:
+    allow to use icons from
+    <a href="http://fontawesome.io" target="_blank">Font Awesome</a> in
+    <a href="eu/webtoolkit/jwt/WIconPair.html" target="_blank">WIconPair</a>. This can be done by giving the name of the icon instead of the URI to an image in the constructor. This also means that the icons can either be a
+    <a href="eu/webtoolkit/jwt/WImage.html" target="_blank">WImage</a> or a
+    <a href="eu/webtoolkit/jwt/WIcon.html" target="_blank">WIcon</a>. Accessing the icons of WIconPair using
+    <a href="eu/webtoolkit/jwt/WIconPair.html#getIcon1()" target="_blank">WIconPair#getIcon1()</a> and
+    <a href="eu/webtoolkit/jwt/WIconPair.html#getIcon2()" target="_blank">WIconPair#getIcon2()</a> is now deprecated in favor of
+    <a href="eu/webtoolkit/jwt/WIconPair.html#getUriIcon1()" target="_blank">WIconPair#getUriIcon1()</a>,
+    <a href="eu/webtoolkit/jwt/WIconPair.html#getUriIcon2()" target="_blank">WIconPair#getUriIcon2()</a>,
+    <a href="eu/webtoolkit/jwt/WIconPair.html#getIconNameIcon1()" target="_blank">WIconPair#getIconNameIcon1()</a>, and
+    <a href="eu/webtoolkit/jwt/WIconPair.html#getIconNameIcon2()" target="_blank">WIconPair#getIconNameIcon2()</a>.
+  </li>
+  <li>
+    <a href="https://redmine.webtoolkit.eu/issues/13131" target="_blank">Issue #13131</a>:
+    make the refresh after
+    <a href="eu/webtoolkit/jwt/WApplication.html#setLocale(java.util.Locale)" target="_blank">WApplication#setLocale()</a> optional.
+  </li>
+  <li>
+    <a href="https://redmine.emweb.be/issues/6584" target="_blank">Issue #6584</a>:
+    add the <code>x-frame-same-origin</code> configuration option that allows to configure whether the header <code>X-Frame-Options: SAMEORIGIN</code> is used or not.
+  </li>
+</ul>
+
 <h2>Release 4.11.1 (November 5, 2024)</h2>
 
 <p>JWt 4.11.1 is a patch release that addresses the following issues:</p>

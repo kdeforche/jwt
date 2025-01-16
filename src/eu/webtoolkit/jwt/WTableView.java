@@ -2173,7 +2173,7 @@ public class WTableView extends WAbstractItemView {
     WApplication app = WApplication.getInstance();
     app.loadJavaScript("js/WTableView.js", wtjs1());
     StringBuilder s = new StringBuilder();
-    s.append("new Wt4_11_1.WTableView(")
+    s.append("new Wt4.11.2.WTableView(")
         .append(app.getJavaScriptClass())
         .append(',')
         .append(this.getJsRef())

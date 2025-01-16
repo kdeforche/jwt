@@ -430,11 +430,11 @@ public abstract class WWidget extends WObject {
     }
     String side = orientation == Orientation.Horizontal ? ".Horizontal" : ".Vertical";
     this.doJavaScript(
-        "Wt4_11_1.positionAtWidget('"
+        "Wt4.11.2.positionAtWidget('"
             + this.getId()
             + "','"
             + widget.getId()
-            + "',Wt4_11_1"
+            + "',Wt4.11.2"
             + side
             + ");");
   }
@@ -923,8 +923,8 @@ public abstract class WWidget extends WObject {
    * Refresh the widget.
    *
    * <p>The refresh method is invoked when the locale is changed using {@link
-   * WApplication#setLocale(Locale locale) WApplication#setLocale()} or when the user hit the
-   * refresh button.
+   * WApplication#setLocale(Locale locale, boolean doRefresh) WApplication#setLocale()} or when the
+   * user hit the refresh button.
    *
    * <p>The widget must actualize its contents in response.
    *
@@ -946,7 +946,7 @@ public abstract class WWidget extends WObject {
    * @see WWidget#isRendered()
    */
   public String getJsRef() {
-    return "Wt4_11_1.$('" + this.getId() + "')";
+    return "Wt4.11.2.$('" + this.getId() + "')";
   }
   /**
    * Sets an attribute value.

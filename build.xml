@@ -1,7 +1,7 @@
 <project name="jwt" default="all" basedir=".">
   <!-- Name of project and version -->
   <property name="proj.name" value="jwt"/>
-  <property name="proj.version" value="4.11.1"/>
+  <property name="proj.version" value="4.11.2"/>
 
   <!-- Global properties for this build -->
   <property name="src.java.dir" value="src"/>

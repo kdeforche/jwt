@@ -92,7 +92,11 @@ final class OAuthRedirectEndpoint extends WResource {
     } else {
       String appJs = app.getJavaScriptClass();
       o.append(
-              "<!DOCTYPE html><html lang=\"en\" dir=\"ltr\">\n<head><title></title>\n<script type=\"text/javascript\">\nfunction load() { if (window.opener.")
+          "<!DOCTYPE html><html lang=\"en\" dir=\"ltr\">\n<head><title></title>\n<script type=\"text/javascript\"");
+      if (response.getNonce().length() != 0) {
+        o.append(" nonce=\"").append(response.getNonce()).append("\"");
+      }
+      o.append(">\nfunction load() { if (window.opener.")
           .append(appJs)
           .append(") {var ")
           .append(appJs)

@@ -192,6 +192,7 @@ public abstract class WtServlet extends HttpServlet {
 	void handleRequest(final HttpServletRequest request, final HttpServletResponse response) {
 		String pathInfo = WebRequest.computePathInfo(request, configuration);
 		String resourcePath = configuration.getProperty(WApplication.RESOURCES_URL);
+		addDefaultHeader(response);
 		
 		if (pathInfo != null) {
 			String scriptName = WebRequest.computeScriptName(request, configuration);
@@ -594,5 +595,12 @@ public abstract class WtServlet extends HttpServlet {
 	
 	String getContextPath() {
 		return getServletContext().getContextPath();
+	}
+	
+	private void addDefaultHeader(HttpServletResponse response) {
+		List<HttpHeader> httpHeaders = configuration.getHttpHeaders();
+		for (HttpHeader header : httpHeaders) {
+			response.addHeader(header.getName(), header.getContents());
+		}
 	}
 }

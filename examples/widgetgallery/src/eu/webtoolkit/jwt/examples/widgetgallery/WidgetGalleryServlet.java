@@ -1,5 +1,6 @@
 package eu.webtoolkit.jwt.examples.widgetgallery;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +25,38 @@ public class WidgetGalleryServlet extends WtServlet {
 				setTinyMCEVersion(4);
 				getProperties().put("leafletJSURL", "https://unpkg.com/leaflet@1.5.1/dist/leaflet.js");
 				getProperties().put("leafletCSSURL", "https://unpkg.com/leaflet@1.5.1/dist/leaflet.css");
+        setBotList(new ArrayList<String>(
+          List.of(".*Slurp.*",
+                  ".*crawl.*",
+                  ".*Crawl.*",
+                  ".*bot.*",
+                  ".*Bot.*",
+                  ".*spider.*",
+                  ".*Spider.*",
+                  ".*ia_archiver.*",
+                  ".*Twiceler.*",
+                  ".*Yandex.*",
+                  ".*Nutch.*",
+                  ".*Ezooms.*",
+                  ".*Scrapy.*",
+                  ".*Buck.*",
+                  ".*Barkrowler.*",
+                  ".*Censys.*",
+                  ".*Blogtrottr.*",
+                  ".*InternetMeasurement.*",
+                  ".*Owler.*",
+                  ".*centuryb.o.t9.*",
+                  ".*Turnitin.*",
+                  ".*MatchorySearch.*",
+                  ".*newspaper.*",
+                  ".*Go-http-client.*",
+                  ".*Mojolicious.*",
+                  ".*python-requests.*",
+                  ".*Python.*",
+                  ".*python-urllib.*",
+                  ".*Apache-HttpClient.*",
+                  ".*com.apple.WebKit.Networking.*",
+                  ".*NetworkingExtension.*")));
 			}
 
 			@Override

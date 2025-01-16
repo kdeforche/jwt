@@ -52,7 +52,7 @@ public class WEnvironment {
 
   /** Wt&apos;s JavaScript scope. */
   public static String getJavaScriptWtScope() {
-    return "Wt4_11_1";
+    return "Wt4.11.2";
   }
   /**
    * Parameters passed to the application.
@@ -253,7 +253,7 @@ public class WEnvironment {
    *
    * <p>
    *
-   * @see WApplication#setLocale(Locale locale)
+   * @see WApplication#setLocale(Locale locale, boolean doRefresh)
    */
   public Locale getLocale() {
     return this.locale_;
@@ -447,7 +447,7 @@ public class WEnvironment {
    * <p>Example: <code>&quot;1.99.2&quot;</code>
    */
   public static String getLibraryVersion() {
-    return "4.11.1";
+    return "4.11.2";
   }
   // public void libraryVersion(final bad java simple ref int series, final bad java simple ref int
   // major, final bad java simple ref int minor) ;
